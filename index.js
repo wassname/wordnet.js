@@ -3,11 +3,11 @@
 let helpers = require("./helpers")
 let lodash = require("lodash")
 
-let data ={
-  noun: require("./data/Noun").data,
-  adjective: require("./data/Adjective").data,
-  verb: require("./data/Verb").data,
-  adverb: require("./data/Adverb").data,
+let data = {
+    noun: require("./data/Noun").data,
+    adjective: require("./data/Adjective").data,
+    verb: require("./data/Verb").data,
+    adverb: require("./data/Adverb").data,
 }
 
 
@@ -99,7 +99,7 @@ exports.noun = function (s) {
 exports.synonyms = function (s, k) {
     return lookup(s, k).map(function (syn) {
         let loose
-        if (syn.syntactic_category=='Adjective'){
+        if (syn.syntactic_category == 'Adjective') {
             loose = syn.similar.map(function (id) {
                 return lookup(id, k)[0].words
             })
@@ -119,9 +119,13 @@ exports.synonyms = function (s, k) {
 }
 
 exports.antonyms = function (s, k) {
-    let ants = lookup(s, 'adjective').map(function (syn) {
-        return syn.antonym
-    })
+    let ants = lookup(s, 'adjective')
+        .map(function (syn) {
+            return syn.antonym
+        })
+        .filter(function (antonym) {
+            return antonym!==undefined
+        })
     ants = helpers.unique(helpers.flatten(ants))
     let all = ants.map(function (id) {
         return lookup(id, k)[0]
