@@ -1,4 +1,5 @@
-'use strict'
+"use strict"
+
 let helpers = require("./helpers")
 let lodash = require("lodash")
 
@@ -12,6 +13,13 @@ let data ={
 
 
 //some helper methods
+
+/**
+ * Search through only one word type
+ * @param  {String}     - str word
+ * @param  {Type} k     - type from (adjective|verb|noun|adverb)
+ * @return {Array}
+ */
 let fast_search = function (str, k) {
     let founds = []
     let l = data[k].length;
@@ -30,6 +38,7 @@ let is_id = function (str) {
     return str.match(/[a-z]\.(adjective|verb|noun|adverb)\.[0-9]/i) !== null
 }
 
+/** Lookup by {String}id and {String}k from (adjective|verb|noun|adverb) **/
 let id_lookup = function (id, k) {
     let l = data[k].length;
     for (let i = 0; i < l; i++) {
@@ -40,6 +49,12 @@ let id_lookup = function (id, k) {
     return null
 }
 
+/**
+ * Lookup data for a word
+ * @param  {String} str - word
+ * @param  {String} k   - type from (adjective|verb|noun|adverb)
+ * @return {Array}      - Objects for each result containing id, description etc
+ */
 let lookup = function (str, k) {
     //given an id
     if (is_id(str)) {
@@ -81,11 +96,16 @@ exports.noun = function (s) {
     return lookup(s, "noun")
 }
 
-exports.synonyms = function (s) {
-    return lookup(s, "adjective").map(function (syn) {
-        let loose = syn.similar.map(function (id) {
-            return lookup(id, "adjective")[0].words
-        })
+exports.synonyms = function (s, k) {
+    return lookup(s, k).map(function (syn) {
+        let loose
+        if (syn.syntactic_category=='Adjective'){
+            loose = syn.similar.map(function (id) {
+                return lookup(id, k)[0].words
+            })
+        } else {
+            loose = []
+        }
         return {
             synset: syn.id,
             close: syn.words.filter(function (w) {
@@ -98,22 +118,25 @@ exports.synonyms = function (s) {
     })
 }
 
-exports.antonyms = function (s) {
-    let ants = lookup(s, "adjective").map(function (syn) {
+exports.antonyms = function (s, k) {
+    let ants = lookup(s, 'adjective').map(function (syn) {
         return syn.antonym
     })
     ants = helpers.unique(helpers.flatten(ants))
     let all = ants.map(function (id) {
-        return lookup(id, "adjective")[0]
+        return lookup(id, k)[0]
     })
     return all
 }
+
+/** Returns unique categories from ["Adverb", "Noun", "Adjective", "Verb"] **/
 exports.pos = function (s) {
     return helpers.unique(lookup(s).map(function (syn) {
         return syn.syntactic_category
     }))
 }
 
+/** Returns all words in an array **/
 exports.words = function (cb) {
     let keys = Object.keys(data)
     let words = {}
@@ -129,6 +152,7 @@ exports.words = function (cb) {
 
 // console.log(exports.pos("perverse"))
 // console.log(exports.antonyms("perverse"))
+// console.log(exports.synonyms("perverse"))
 // exports.words((arr)=>{
 //   console.log(arr.filter((s)=> s.match(/cool/)))
 // })
