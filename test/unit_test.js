@@ -4,9 +4,7 @@ var fs = require('fs');
 
 var chai = require('chai');
 var chaiThings = require('chai-things');
-var chaiAsPromised = require('chai-as-promised');
 chai.use(chaiThings) // expect that all things in array/obj are...
-    // chai.use(chaiAsPromised) // expect that promise eventually will give...
 
 var WordNetJs = require("../index")
 
@@ -51,6 +49,16 @@ describe('build', function () {
         })
     })
 })
+
+// describe('wordnetjs.load', function () {
+//     it('description', function () {
+//         return new WordNetJs()
+//             .load()
+//             .then(wn => {
+//                 expect(wn).to.have.property('data')
+//             })
+//     });
+// })
 
 describe('wordnetjs', function () {
     var wn

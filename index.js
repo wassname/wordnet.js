@@ -3,11 +3,10 @@
 var _ = require('lodash')
 
 // polyfill
-if (!this.Promise) require('es6-promise');
-var self=this
-var fetch
-if (this.window && (!fetch)) fetch=require('fetch-polyfill');
-else if (!fetch) fetch=require('node-fetch')
+if (typeof window !== 'undefined') {
+    if (!window.Promise) require('es6-promise');
+    if (!window.fetch) require('whatwg-fetch');
+}
 
 
 // import json files
@@ -15,33 +14,37 @@ var wordNetJS = module.exports = function () {}
 
 /**
  * Fetch data from json, load to this.data and return promise
- * @param  {String} dataDir - Url of data directory
+ * @param  {Object} files - Urls of json files {noun:'./noun.json',verb:'',adjective:'',adverb:''}
  * @param  {Functional} callback - alternative callback usage
  * @return {Promise}         - Promise of data in form {noun:[],verb:[],adjective:[],adverb:[]}
  */
-wordNetJS.prototype.load = function (dataDir, callback) {
-    if (this.data) return new new Promise(function(resolve, reject) {
-        resolve(this.data)
+wordNetJS.prototype.load = function (files, callback) {
+    var self = this
+    if (self.data) return new new Promise(function (resolve, reject) {
+        resolve(self.data)
     });
 
-    var files = ['noun', 'averb', 'adjective', 'adverb']
+    files = files || {
+        noun: './data/noun.json',
+        adverb: './data/adverb.json',
+        adjective: './data/adjective.json',
+        verb: './data/verb.json',
+    }
+    var keys = Object.keys(files)
     return Promise.all(
-            files
-            .map(s => s.charAt(0).toUpperCase() + s.slice(1)) // capatalize first letter
-            .map(file => dataDir + '/' + file + '.json') // add path and ext
-            .map(fetch) // fetch and return promise
+            // fetch json
+            _.values(files)
+            .map(url => {
+                return window.fetch(url, {}).then(res => res.json())
+            })
         )
-        .then(allData => {
-            return allData
-                .map(res => res.json()) // parse json
-                // combine into object properties e.g. {noun:[],...}
-                .reduce((prev, curr, i) => prev[files[i]] = curr.json(), {})
-                .then((data) => {
-                    if (callback) callback(data)
-                    // assign to this and return
-                    this.data=data
-                    return this // for chaining
-                })
+        // combine into object properties e.g. {noun:[],...}
+        .then(results => _.zipObject(keys,results))
+        .then(data => {
+            // assign to this and return
+            self.data = data
+            if (callback) callback(data)
+            return self // for chaining
         })
 }
 
@@ -131,10 +134,10 @@ wordNetJS.prototype.noun = function (s) {
 
 wordNetJS.prototype.synonyms = function (s, k) {
     var self = this
-    return this.lookup(s, k).map(function(syn) {
+    return this.lookup(s, k).map(function (syn) {
         let loose
         if (syn.syntactic_category == 'Adjective') {
-            loose = syn.similar.map(function(id) {
+            loose = syn.similar.map(function (id) {
                 return self.lookup(id, k)[0].words
             })
         } else {
@@ -181,7 +184,7 @@ wordNetJS.prototype.pos = function (s) {
 
 /** Returns all words from data as an array **/
 wordNetJS.prototype.words = function (cb) {
-    if (!this._words){
+    if (!this._words) {
         let keys = Object.keys(this.data)
         let words = {}
         for (let i = 0; i < keys.length; i++) {
@@ -191,7 +194,7 @@ wordNetJS.prototype.words = function (cb) {
                 }
             }
         }
-        this._words=words
+        this._words = words
     }
     cb(Object.keys(this._words).sort())
 }
