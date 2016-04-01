@@ -1,3 +1,7 @@
+# custom
+
+build/freebase.key.json
+build/*.json
 
 # Created by https://www.gitignore.io/api/node,linux,windows
 
