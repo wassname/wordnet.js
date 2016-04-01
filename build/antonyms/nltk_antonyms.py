@@ -21542,19 +21542,25 @@ words=[
   'browned'
   ]
 
-big={}
-for w in words:
-  syns= wn.synsets(w, pos='a')
-  arr=[]
-  for s in syns:
-    for l in s.lemmas:
-      x= l.antonyms()
-      if x:
-        arr.append(x)
-  if len(arr)>0:
-    big[s]=arr
 
-print big
+def main():
+    big = {}
+    for w in words:
+        syns = wn.synsets(w, pos='a')
+        arr = []
+        for s in syns:
+            for l in s.lemmas():
+                x = l.antonyms()
+                if x:
+                    arr.append(x)
+        if len(arr) > 0:
+            big[s] = arr
+
+    print big
+
+
+if __name__ == '__main__':
+    main()
 
 
 #result...

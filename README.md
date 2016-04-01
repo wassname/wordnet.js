@@ -1,10 +1,51 @@
+Fork of [wordnetjs](https://github.com/nlp-compromise/wordnet.js) for frontend usage.
 
+This unpack the json data on install. It loads the data from you server then promises it's api.
+
+Install:
+
+`npm install git+https://github.com/wassname/wordnet.js.git`
+
+Usage:
+
+```javascript
+var WordNetJs = require('wordnetjs')
+var dataPath = 'node_modules/wordnetjs/data' // or where ever you host the data
+var wordNet = new WordNetJs().load(dataPath)
+wordNet.then((wn) => {
+    //generic lookup
+    wn.lookup('warrant')
+    //6 results
+
+    //pos-specific lookups
+    wn.verb('warrant') // (1 result)
+    wn.adjective('cheeky')
+    wn.adverb('slightly')
+    wn.noun('grape')
+
+    //sugar
+    wn.synonyms("perverse")
+    // [{id:"depraved.adjective.01"...}]
+    wn.antonyms("perverse")
+    // [{id:"docile.adjective.01"}]
+    wn.pos("swim")
+    // [ 'Verb', 'Noun' ]
+
+    // unique, alphabetical list of all words
+    wn.words((arr)=>{
+      console.log(arr.filter((w)=> w.match(/cool/))
+    })
+    // [ 'air-cool', 'air-cooled', 'cool',  'cool down', ...
+})
+```
+
+----
 
 loving build of [wordnet](http://wordnet.princeton.edu/) in JSON.
 
 no memory pointers, no python, no DSL, no guff. no crazy-framework stuff at all.
 
-the data is zipped for github, but it automatically unzips when you first use it.
+the data is zipped for github, but it automatically unzips when you first install it.
 
     npm install wordnetjs
 
@@ -13,35 +54,6 @@ then you can just do your random shit.
 it's 6mb -> 32mb
 
 it's the cutest way to use wordnet by a pretty wide margin.
-
-#API
-````javascript
-wn= require("wordnetjs")
-//generic lookup
-wn.lookup('warrant')
-//6 results
-
-//pos-specific lookups
-wn.verb('warrant') // (1 result)
-wn.adjective('cheeky')
-wn.adverb('slightly')
-wn.noun('grape')
-
-//sugar
-wn.synonyms("perverse")
-// [{id:"depraved.adjective.01"...}]
-wn.antonyms("perverse")
-// [{id:"docile.adjective.01"}]
-wn.pos("swim")
-//[ 'Verb', 'Noun' ]
-
-//unique, alphabetical list of all words
-wn.words((arr)=>{
-  console.log(arr.filter((w)=> w.match(/cool/))
-})
-//[ 'air-cool', 'air-cooled', 'cool',  'cool down', ...
-
-````
 
 
 # Liberties taken
@@ -138,6 +150,6 @@ participle of verb
 
 
 # roll your own build
-to build your own, get a [freebase key](https://code.google.com/apis/console/?pli=1) and put it in ./build/build.js
+to build your own, get a [freebase key](https://code.google.com/apis/console/?pli=1) and put it in './build/freebase.key.json'
 run 'npm install'
 then 'node ./build.js'

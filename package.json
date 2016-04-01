@@ -8,18 +8,21 @@
     "url": "git://github.com/nlp-compromise/wordnet.js.git"
   },
   "scripts": {
-    "test": "mocha ./tests/unit_test.js ",
-    "postinstall": "node -e \"require('./unpack').load_or_unzip(function(){})\""
+    "test": "mocha ./test"
   },
   "main": "index.js",
   "engines": [
     "node >= 0.3.6"
   ],
   "dependencies": {
+    "es6-promise": "^3.1.2",
+    "fetch-polyfill": "^0.8.2",
+    "mz": "^2.4.0",
     "nodeunit": "0.9.*"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
     "chai-things": "^0.2.0",
     "dirtyjs": "*",
     "freebase": "*",
